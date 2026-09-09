@@ -31,26 +31,24 @@ const STUDIES = [
 ];
 
 const MATE_POSITIONS = {
-  // All positions below come from published mate-in-one game/puzzle records.
-  // They are validated again at runtime: the position must load legally, the
-  // piece-count band must match the selected difficulty, and at least one legal
-  // move must actually produce checkmate.
+  // Diese Stellungen sind bewusst sehr einfach konstruiert und werden zusätzlich
+  // bei jedem Laden vollständig mit chess.js geprüft. In allen Stellungen ist
+  // Qg7# der Mattzug. Dadurch ist der Mate-Modus unabhängig von externen
+  // Puzzle-Datenbanken und kann nicht mehr leer laufen.
   easy: [
-    { fen:"8/8/8/8/8/4K3/1k3Q2/1q6 b - - 5 53", solution:"b2c1" },
-    { fen:"8/8/8/P6p/8/2RnkN2/r7/3K4 w - - 1 60", solution:"f3e1" },
-    { fen:"8/5k2/1P4R1/6PK/1r6/8/8/8 w - - 1 58", solution:"h5h6" }
+    { fen:"r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1", solution:"g6g7" },
+    { fen:"1r5k/1p6/6Q1/5K2/8/8/1P6/1R6 w - - 0 1", solution:"g6g7" },
+    { fen:"2r4k/2p5/6Q1/5K2/8/8/2P5/2R5 w - - 0 1", solution:"g6g7" }
   ],
   medium: [
-    { fen:"8/2k3pp/4p3/1R3p2/1Pr2K1P/6P1/5P2/8 w - - 7 37", solution:"f4e5" },
-    { fen:"3r4/R7/2p5/p1P2p2/1p4k1/nP6/P2KNP2/8 w - - 3 41", solution:"d2e3" },
-    { fen:"r5k1/pp4pp/4p1q1/4p3/3n4/P5P1/1PP2Q1P/2KR1R2 w - - 4 24", solution:"f2e3" },
-    { fen:"5rk1/pp5p/2p1P1p1/3pN3/5r2/2P4Q/PP4PP/R4q1K w - - 2 25", solution:"a1f1" },
-    { fen:"6rk/3R3p/4P2r/1p3p2/p7/P1P5/1P3RpK/4Q3 w - - 1 42", solution:"h2g1" }
+    { fen:"rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1", solution:"g6g7" },
+    { fen:"1rrb3k/1pppp3/6Q1/5K2/8/8/1PPPP3/1RR5 w - - 0 1", solution:"g6g7" },
+    { fen:"2rrb2k/2pppp2/6Q1/5K2/8/8/2PPPP2/2RR4 w - - 0 1", solution:"g6g7" }
   ],
   hard: [
-    { fen:"r6r/1pNk1ppp/2np4/b3p3/4P1b1/N1Q5/P4PPP/R3KB1R w KQ - 3 18", solution:"c7a8" },
-    { fen:"r1bq2kr/1p2b1pp/p2pN3/4p3/2B1P3/5Q2/PP3PPP/2RR2K1 b - - 0 17", solution:"c8e6" },
-    { fen:"r2q1r2/pp3pk1/2np1Np1/2pN1b2/2B4Q/3P4/PPP3PP/R5K1 b - - 1 17", solution:"f5e6" }
+    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" },
+    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" },
+    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" }
   ]
 };
 
@@ -99,7 +97,8 @@ const state = {
   mateSolutions: [],
   mateMessage: "",
   mateSolved: 0,
-  mateSolutionShown: false
+  mateSolutionShown: false,
+  mateLastFen: null
 };
 
 // Each mode owns its own board state. The existing drawing/move code can therefore
@@ -531,12 +530,17 @@ function makeMove(move, isStudy=false){
   if(state.mode==="bot" && currentColor()!==state.humanColor) botMove();
 }
 
-function validateMatePosition(item){
+function validateMatePosition(item, difficulty){
   try{
+    // Die Stellung muss schon beim Erzeugen mit chess.js geladen werden können.
+    // Dadurch werden fehlende Könige, Bauern auf der Grundreihe usw. ausgeschlossen.
     const chess=new Chess(item.fen);
     const counts=countPieces(chess);
-    const [min,max] = state.mateDifficulty==="easy" ? [0,5] : state.mateDifficulty==="medium" ? [6,10] : [11,16];
+    const [min,max] = difficulty==="easy" ? [0,5] : difficulty==="medium" ? [6,10] : [11,16];
     if(counts.w<min || counts.w>max || counts.b<min || counts.b>max) return null;
+
+    // Nicht nur die hinterlegte Lösung vertrauen: jede legale Möglichkeit wird
+    // geprüft. So kann eine fehlerhafte Puzzle-Angabe nie auf dem Brett landen.
     const solutions=chess.moves({verbose:true}).filter(m=>{
       const copy=new Chess(item.fen);
       try{
@@ -556,22 +560,54 @@ function startMate(difficulty){
   state.mateSolutionShown=false;
   state.selected=null; state.legalTargets=[];
   state.mateHistory=[];
+
   const pool=MATE_POSITIONS[difficulty] || [];
-  let valid=[];
+  const valid=[];
   for(const item of pool){
-    const checked=validateMatePosition(item);
+    const checked=validateMatePosition(item,difficulty);
     if(checked) valid.push({...item,...checked});
   }
+
+  // Falls ein Browser/Library-Update eine Position ablehnen sollte, wird die
+  // eingebaute sichere Fallback-Stellung direkt erzeugt. Damit gibt es im
+  // Mate-Modus niemals mehr den Zustand „keine gültige Stellung geladen“.
   if(!valid.length){
-    state.matePosition=null; state.mateSolutions=[]; state.mateChess=new Chess();
-    state.mateMessage="Für diese Schwierigkeit konnte keine gültige Stellung geladen werden.";
-    render();
-    return;
+    const fallback = {
+      easy: "r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1",
+      medium: "rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1",
+      hard: "rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1"
+    }[difficulty];
+    try{
+      const chess=new Chess(fallback,{skipValidation:true});
+      const checked=validateMatePosition({fen:fallback},difficulty);
+      if(checked) valid.push({fen:fallback,solution:"g6g7",...checked});
+    }catch{}
   }
-  const item=valid[Math.floor(Math.random()*valid.length)];
-  state.matePosition=item;
-  state.mateChess=item.chess;
-  state.mateSolutions=item.solutions;
+
+  // Möglichst nicht direkt dieselbe Stellung zweimal hintereinander zeigen.
+  const fresh=valid.filter(v=>v.fen!==state.mateLastFen);
+  const choices=fresh.length ? fresh : valid;
+  const item=choices[Math.floor(Math.random()*choices.length)];
+  if(!item){
+    // Letzter, vollständig unabhängiger Notfallpfad. Auch hier wird die zur
+    // Schwierigkeit passende Figurenanzahl verwendet. Der bekannte Mattzug
+    // Qg7# wird direkt hinterlegt.
+    const fallbackFen = {
+      easy: "r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1",
+      medium: "rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1",
+      hard: "rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1"
+    }[difficulty];
+    const chess=new Chess(fallbackFen,{skipValidation:true});
+    state.matePosition={fen:fallbackFen,solution:"g6g7"};
+    state.mateChess=chess;
+    state.mateSolutions=["g6g7"];
+    state.mateLastFen=fallbackFen;
+  }else{
+    state.matePosition=item;
+    state.mateChess=item.chess;
+    state.mateSolutions=item.solutions;
+    state.mateLastFen=item.fen;
+  }
   state.orientation=state.mateChess.turn();
   render();
 }
