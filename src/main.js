@@ -28,48 +28,31 @@ const STUDIES = [
   { id:"english", name:"English Trap", color:"w", moves:["c4","e5","Nc3","Nc6","Nf3","g6","d4","exd4","Nd5","Bg7","Bg5","Nge7","Nxd4","Bxd4","Qxd4","Nxd4","Nf6+","Kf8","Bh6#"] },
   { id:"englund", name:"Englund Gambit", color:"b", moves:["d4","e5","dxe5","Nc6","Nf3","Qe7","Bf4","Qb4+","Bd2","Qxb2","Bc3","Bb4","Qd2","Bxc3","Qxc3","Qc1#"] },
   { id:"stafford", name:"Stafford Gambit", color:"b", moves:["e4","e5","Nf3","Nf6","Nxe5","Nc6","Nxc6","dxc6","d3","Bc5","Be2","h5","O-O","Ng4","h3","Qd6","hxg4","hxg4","g3","Qxg3#"] }
-
 ];
 
-const MATE_IN_1 = {
+const MATE_POSITIONS = {
+  // All positions below come from published mate-in-one game/puzzle records.
+  // They are validated again at runtime: the position must load legally, the
+  // piece-count band must match the selected difficulty, and at least one legal
+  // move must actually produce checkmate.
   easy: [
-    { fen:"8/8/8/8/Q7/K7/8/k7 w - - 0 1", answer:"Qd1#" },
-    { fen:"8/8/8/Q7/8/K7/8/k7 w - - 0 1", answer:"Qe1#" },
-    { fen:"8/8/Q7/8/8/K7/8/k7 w - - 0 1", answer:"Qf1#" },
-    { fen:"8/Q7/8/8/8/K7/8/k7 w - - 0 1", answer:"Qg1#" },
-    { fen:"8/8/8/8/q7/K7/8/k7 b - - 0 1", answer:"Qd1#" },
-    { fen:"8/8/8/q7/8/K7/8/k7 b - - 0 1", answer:"Qe1#" },
-    { fen:"8/8/q7/8/8/K7/8/k7 b - - 0 1", answer:"Qf1#" },
-    { fen:"8/q7/8/8/8/K7/8/k7 b - - 0 1", answer:"Qg1#" }
+    { fen:"8/8/8/8/8/4K3/1k3Q2/1q6 b - - 5 53", solution:"b2c1" },
+    { fen:"8/8/8/P6p/8/2RnkN2/r7/3K4 w - - 1 60", solution:"f3e1" },
+    { fen:"8/5k2/1P4R1/6PK/1r6/8/8/8 w - - 1 58", solution:"h5h6" }
   ],
   medium: [
-    { fen:"8/3ppppp/8/8/Q7/K4PPP/6PP/k7 w - - 0 1", answer:"Qd1#" },
-    { fen:"8/3ppppp/8/Q7/8/K4PPP/6PP/k7 w - - 0 1", answer:"Qe1#" },
-    { fen:"8/3ppppp/Q7/8/8/K4PPP/6PP/k7 w - - 0 1", answer:"Qf1#" },
-    { fen:"8/Q2ppppp/8/8/8/K4PPP/6PP/k7 w - - 0 1", answer:"Qg1#" },
-    { fen:"8/3PPPPP/8/8/q7/K4ppp/6pp/k7 b - - 0 1", answer:"Qd1#" },
-    { fen:"8/3PPPPP/8/q7/8/K4ppp/6pp/k7 b - - 0 1", answer:"Qe1#" },
-    { fen:"8/3PPPPP/q7/8/8/K4ppp/6pp/k7 b - - 0 1", answer:"Qf1#" },
-    { fen:"8/q2PPPPP/8/8/8/K4ppp/6pp/k7 b - - 0 1", answer:"Qg1#" }
+    { fen:"8/2k3pp/4p3/1R3p2/1Pr2K1P/6P1/5P2/8 w - - 7 37", solution:"f4e5" },
+    { fen:"3r4/R7/2p5/p1P2p2/1p4k1/nP6/P2KNP2/8 w - - 3 41", solution:"d2e3" },
+    { fen:"r5k1/pp4pp/4p1q1/4p3/3n4/P5P1/1PP2Q1P/2KR1R2 w - - 4 24", solution:"f2e3" },
+    { fen:"5rk1/pp5p/2p1P1p1/3pN3/5r2/2P4Q/PP4PP/R4q1K w - - 2 25", solution:"a1f1" },
+    { fen:"6rk/3R3p/4P2r/1p3p2/p7/P1P5/1P3RpK/4Q3 w - - 1 42", solution:"h2g1" }
   ],
   hard: [
-    { fen:"4r2q/3ppppp/ppp5/8/Q7/K1P2PPP/PP4PP/k6R w - - 0 1", answer:"Qd1#" },
-    { fen:"4r2q/3ppppp/ppp5/Q7/8/K1P2PPP/PP4PP/k6R w - - 0 1", answer:"Qe1#" },
-    { fen:"4r2q/3ppppp/Qpp5/p7/8/K1P2PPP/PP4PP/k6R w - - 0 1", answer:"Qf1#" },
-    { fen:"4r2q/Q2ppppp/2p5/pp6/8/K1P2PPP/PP4PP/k6R w - - 0 1", answer:"Qg1#" },
-    { fen:"4R2Q/3PPPPP/PPP5/8/q7/K1p2ppp/pp4pp/k6r b - - 0 1", answer:"Qd1#" },
-    { fen:"4R2Q/3PPPPP/PPP5/q7/8/K1p2ppp/pp4pp/k6r b - - 0 1", answer:"Qe1#" },
-    { fen:"4R2Q/3PPPPP/qPP5/P7/8/K1p2ppp/pp4pp/k6r b - - 0 1", answer:"Qf1#" },
-    { fen:"4R2Q/q2PPPPP/2P5/PP6/8/K1p2ppp/pp4pp/k6r b - - 0 1", answer:"Qg1#" }
+    { fen:"r6r/1pNk1ppp/2np4/b3p3/4P1b1/N1Q5/P4PPP/R3KB1R w KQ - 3 18", solution:"c7a8" },
+    { fen:"r1bq2kr/1p2b1pp/p2pN3/4p3/2B1P3/5Q2/PP3PPP/2RR2K1 b - - 0 17", solution:"c8e6" },
+    { fen:"r2q1r2/pp3pk1/2np1Np1/2pN1b2/2B4Q/3P4/PPP3PP/R5K1 b - - 1 17", solution:"f5e6" }
   ]
 };
-
-const MATE_LEVELS = {
-  easy: { name:"Leicht", detail:"5 Figuren oder weniger je Seite" },
-  medium: { name:"Mittel", detail:"6–10 Figuren je Seite" },
-  hard: { name:"Schwer", detail:"11–16 Figuren je Seite" }
-};
-
 
 const THEORY = new Set([
   "e4","d4","c4","Nf3","e5","c5","Nc6","Nf6","d5","d6","e6","g6","c6",
@@ -77,7 +60,9 @@ const THEORY = new Set([
 ]);
 
 const state = {
-  chess: new Chess(),
+  gameChess: new Chess(),
+  studyChess: new Chess(),
+  mateChess: new Chess(),
   mode: "local",
   humanColor: "w",
   orientation: "w",
@@ -89,11 +74,15 @@ const state = {
   clocks: { w: 300000, b: 300000 },
   running: false,
   gameOver: false,
+  gameGameOver: false,
   lastTick: performance.now(),
   hints: { w: 3, b: 3 },
   selected: null,
   legalTargets: [],
   history: [],
+  gameHistory: [],
+  studyHistory: [],
+  mateHistory: [],
   analysis: [],
   analysisCache: [],
   analysisBusy: false,
@@ -105,12 +94,48 @@ const state = {
   studyTest: false,
   studyComplete: false,
   studyMessage: "",
-  mateLevel: "easy",
+  mateDifficulty: null,
   matePosition: null,
-  mateAnswer: "",
+  mateSolutions: [],
   mateMessage: "",
-  mateBusy: false
+  mateSolved: 0,
+  mateSolutionShown: false
 };
+
+// Each mode owns its own board state. The existing drawing/move code can therefore
+// keep using state.chess while switching between Spiel, Studien and Mate in 1
+// without one mode overwriting another mode's position.
+Object.defineProperty(state, "chess", {
+  configurable: true,
+  get() {
+    if (state.screen === "study") return state.studyChess;
+    if (state.screen === "mate") return state.mateChess;
+    return state.gameChess;
+  },
+  set(value) {
+    if (state.screen === "study") state.studyChess = value;
+    else if (state.screen === "mate") state.mateChess = value;
+    else state.gameChess = value;
+  }
+});
+Object.defineProperty(state, "gameOver", {
+  configurable: true,
+  get() { return state.gameGameOver; },
+  set(value) { state.gameGameOver = value; }
+});
+Object.defineProperty(state, "history", {
+  configurable: true,
+  get() {
+    if (state.screen === "study") return state.studyHistory;
+    if (state.screen === "mate") return state.mateHistory;
+    return state.gameHistory;
+  },
+  set(value) {
+    if (state.screen === "study") state.studyHistory = value;
+    else if (state.screen === "mate") state.mateHistory = value;
+    else state.gameHistory = value;
+  }
+});
 
 let engine = null;
 let engineReadyPromise = null;
@@ -157,8 +182,6 @@ function render() {
   if (state.screen === "study") {
     drawBoard();
     drawStudyMoves();
-  } else if (state.screen === "mate") {
-    drawBoard();
   } else {
     drawBoard();
     drawMoves();
@@ -263,30 +286,39 @@ function renderStudy() {
 }
 
 function renderMate() {
-  const p=state.matePosition;
+  const difficulty = state.mateDifficulty;
+  const labels = { easy:"Leicht", medium:"Mittel", hard:"Schwer" };
+  const counts = state.matePosition ? countPieces(state.mateChess) : null;
   return `
     <main class="mate-layout">
       <section class="mate-main">
-        <div class="card mate-header">
+        <div class="mate-toolbar card">
           <div>
             <div class="card-title">Taktiktraining</div>
             <h2>Finde Mate in 1</h2>
-            <p>${p ? `Du bist <b>${state.chess.turn()==="w"?"Weiß":"Schwarz"}</b>. Finde den einzigen Mattzug in einem Zug.` : "Finde in zufälligen Stellungen das Schachmatt in genau einem Zug."}</p>
+            <p>${difficulty ? `${labels[difficulty]} · ${counts ? `${counts.w} weiße / ${counts.b} schwarze Figuren` : ""}` : "Finde in jeder Stellung einen einzigen Zug, der sofort Schachmatt setzt."}</p>
           </div>
-          ${p ? `<button id="mateNew" class="secondary">Neue Stellung</button>` : ""}
+          <div class="mate-actions">
+            <button id="mateBack" class="secondary">Schwierigkeit</button>
+            ${difficulty ? `<button id="mateNew">Neue Stellung</button>` : ""}
+          </div>
         </div>
-        ${!p ? `
-          <div class="card mate-levels">
-            <div class="card-title">Schwierigkeit</div>
-            ${Object.entries(MATE_LEVELS).map(([k,v])=>`<button class="mate-level ${state.mateLevel===k?"selected":""}" data-mate-level="${k}"><b>${v.name}</b><small>${v.detail}</small></button>`).join("")}
+        ${difficulty ? `
+          <div class="mate-board-area">
+            <div class="mate-info">
+              <div><b>${labels[difficulty]}</b> · Gelöst: ${state.mateSolved}</div>
+              <div class="${state.mateSolutionShown ? "mate-solution shown" : "mate-solution"}">${state.mateMessage || "Finde den Mattzug."}</div>
+            </div>
+            <div class="board-wrap"><div id="board" class="board ${PIECES[state.pieceTheme].cls}" style="--light:${BOARD_THEMES[state.boardTheme].light};--dark:${BOARD_THEMES[state.boardTheme].dark}"></div></div>
+            <div class="mate-controls card">
+              <button id="mateHint" class="secondary">Lösung anzeigen</button>
+              <label>Brett<select id="mateBoardTheme">${Object.entries(BOARD_THEMES).map(([k,v])=>`<option value="${k}" ${k===state.boardTheme?"selected":""}>${v.name}</option>`).join("")}</select></label>
+              <label>Figuren<select id="matePieceTheme">${Object.entries(PIECES).map(([k,v])=>`<option value="${k}" ${k===state.pieceTheme?"selected":""}>${v.name}</option>`).join("")}</label>
+            </div>
           </div>
         ` : `
-          <div class="mate-status ${state.mateMessage.startsWith("Falsch")?"error":state.mateMessage.startsWith("Richtig")?"success":""}">${state.mateMessage || "Dein Zug:"} ${state.mateBusy?" Stockfish prüft…":""}</div>
-          <div class="board-wrap"><div id="board" class="board ${PIECES[state.pieceTheme].cls}" style="--light:${BOARD_THEMES[state.boardTheme].light};--dark:${BOARD_THEMES[state.boardTheme].dark}"></div></div>
-          <div class="card mate-controls">
-            <label>Brett<select id="mateBoardTheme">${Object.entries(BOARD_THEMES).map(([k,v])=>`<option value="${k}" ${k===state.boardTheme?"selected":""}>${v.name}</option>`).join("")}</select></label>
-            <label>Figuren<select id="matePieceTheme">${Object.entries(PIECES).map(([k,v])=>`<option value="${k}" ${k===state.pieceTheme?"selected":""}>${v.name}</option>`).join("")}</label>
-            <button id="mateHint" class="secondary">Lösung anzeigen</button>
+          <div class="mate-picker">
+            ${Object.entries(labels).map(([k,v]) => `<button class="mate-option" data-mate-difficulty="${k}"><b>${v}</b><span>${k==="easy"?"Weiß und Schwarz: 5 Figuren oder weniger":k==="medium"?"Beide Seiten: 6–10 Figuren":"Beide Seiten: 11–16 Figuren"}</span></button>`).join("")}
           </div>
         `}
       </section>
@@ -294,10 +326,19 @@ function renderMate() {
   `;
 }
 
+function countPieces(chess) {
+  const counts = {w:0,b:0};
+  for (const rank of "12345678") for (const file of "abcdefgh") {
+    const p = chess.get(file+rank);
+    if (p) counts[p.color]++;
+  }
+  return counts;
+}
+
 function bind() {
-  document.querySelector("#gameTab").onclick = () => { state.screen="game"; render(); };
-  document.querySelector("#studyTab").onclick = () => { state.screen="study"; render(); };
-  document.querySelector("#mateTab").onclick = () => { state.screen="mate"; state.matePosition=null; state.mateMessage=""; render(); };
+  document.querySelector("#gameTab").onclick = () => switchScreen("game");
+  document.querySelector("#studyTab").onclick = () => switchScreen("study");
+  document.querySelector("#mateTab").onclick = () => switchScreen("mate");
 
   if (state.screen === "game") {
     document.querySelector("#newGame").onclick = newGame;
@@ -311,23 +352,40 @@ function bind() {
     document.querySelectorAll("[data-mode]").forEach(b => b.onclick=()=>{state.mode=b.dataset.mode;newGame();});
     document.querySelectorAll("[data-color]").forEach(b => b.onclick=()=>{state.humanColor=b.dataset.color;newGame();});
     document.querySelectorAll("[data-time]").forEach(b => b.onclick=()=>{state.timeBase=+b.dataset.time;state.increment=+b.dataset.inc;newGame();});
-  } else if (state.screen === "mate") {
-    document.querySelectorAll("[data-mate-level]").forEach(b=>b.onclick=()=>startMate(b.dataset.mateLevel));
-    if(state.matePosition){
-      document.querySelector("#mateNew").onclick=()=>startMate(state.mateLevel);
-      document.querySelector("#mateHint").onclick=showMateHint;
-      document.querySelector("#mateBoardTheme").onchange=e=>{state.boardTheme=e.target.value;render();};
-      document.querySelector("#matePieceTheme").onchange=e=>{state.pieceTheme=e.target.value;render();};
+  } else if (state.screen === "study") {
+    if (state.study) {
+      document.querySelector("#studyBack").onclick = () => { state.study=null; state.studyIndex=0; state.studyComplete=false; state.studyMessage=""; state.studyChess=new Chess(); state.studyHistory=[]; clearSelection(); render(); };
+      document.querySelector("#studyReset").onclick = () => startStudy(state.study.id);
+      document.querySelector("#studyTest").onchange = e => { state.studyTest=e.target.checked; state.studyMessage=""; render(); };
+      document.querySelector("#studyBoardTheme").onchange = e => { state.boardTheme=e.target.value; render(); };
+      document.querySelector("#studyPieceTheme").onchange = e => { state.pieceTheme=e.target.value; render(); };
+    } else {
+      document.querySelectorAll("[data-study]").forEach(b=>b.onclick=()=>startStudy(b.dataset.study));
     }
-  } else if (state.study) {
-    document.querySelector("#studyBack").onclick = () => { state.study=null; state.studyIndex=0; state.studyComplete=false; state.studyMessage=""; render(); };
-    document.querySelector("#studyReset").onclick = () => startStudy(state.study.id);
-    document.querySelector("#studyTest").onchange = e => { state.studyTest=e.target.checked; state.studyMessage=""; render(); };
-    document.querySelector("#studyBoardTheme").onchange = e => { state.boardTheme=e.target.value; render(); };
-    document.querySelector("#studyPieceTheme").onchange = e => { state.pieceTheme=e.target.value; render(); };
   } else {
-    document.querySelectorAll("[data-study]").forEach(b => b.onclick=()=>startStudy(b.dataset.study));
+    if (state.mateDifficulty) {
+      document.querySelector("#mateBack").onclick = () => { state.mateDifficulty=null; state.mateMessage=""; state.mateSolutionShown=false; clearSelection(); render(); };
+      document.querySelector("#mateNew").onclick = () => startMate(state.mateDifficulty);
+      document.querySelector("#mateHint").onclick = revealMateSolution;
+      document.querySelector("#mateBoardTheme").onchange = e => { state.boardTheme=e.target.value; render(); };
+      document.querySelector("#matePieceTheme").onchange = e => { state.pieceTheme=e.target.value; render(); };
+    } else {
+      document.querySelectorAll("[data-mate-difficulty]").forEach(b=>b.onclick=()=>startMate(b.dataset.mateDifficulty));
+    }
   }
+}
+
+function switchScreen(screen) {
+  state.screen=screen;
+  clearSelection();
+  state.engineBusy=false;
+  render();
+  if (screen === "game" && state.mode==="bot" && currentColor()!==state.humanColor && !state.gameOver) botMove();
+}
+
+function clearSelection() {
+  state.selected=null;
+  state.legalTargets=[];
 }
 
 function drawBoard() {
@@ -344,7 +402,7 @@ function drawBoard() {
     div.dataset.square=square;
     if(state.selected===square) div.classList.add("selected");
     if(state.legalTargets.includes(square)) div.classList.add("target");
-    if(lastMove && (lastMove.lan.slice(2,4)===square || lastMove.lan.slice(0,2)===square)) div.classList.add("last");
+    if(lastMove && lastMove.lan){ if(lastMove.lan.slice(2,4)===square) div.classList.add("last","last-to"); if(lastMove.lan.slice(0,2)===square) div.classList.add("last","last-from"); }
     if(piece) div.innerHTML=`<span class="piece">${PIECE_GLYPHS[piece.color][piece.type]}</span>`;
     if(c===0) div.insertAdjacentHTML("afterbegin",`<span class="coord rank">${rank}</span>`);
     if(r===7) div.insertAdjacentHTML("beforeend",`<span class="coord file">${file}</span>`);
@@ -366,25 +424,36 @@ function drawStudyMoves(){
 }
 
 function clickSquare(square){
-  if(state.gameOver || state.engineBusy || state.mateBusy) return;
-  if(state.screen==="mate" && !state.matePosition) return;
+  if((state.screen==="game" && state.gameOver) || state.engineBusy) return;
+  if(state.screen==="mate"){ clickMateSquare(square); return; }
   if(state.mode==="bot" && currentColor()!==state.humanColor) return;
   if(state.study && !studyIsHumanTurn()) return;
 
   const piece=state.chess.get(square);
   if(state.selected){
     const move=state.legalTargets.includes(square)?{from:state.selected,to:square,promotion:state.promotion}:null;
-    if(move){
-      if(state.screen==="mate"){ attemptMateMove(move); return; }
-      attemptMove(move); return;
-    }
+    if(move){ attemptMove(move); return; }
   }
   if(piece && piece.color===currentColor()){
     state.selected=square;
     state.legalTargets=state.chess.moves({square,verbose:true}).map(m=>m.to);
   } else {
-    state.selected=null; state.legalTargets=[];
+    clearSelection();
   }
+  drawBoard();
+}
+
+function clickMateSquare(square){
+  if(!state.mateDifficulty || !state.matePosition) return;
+  const piece=state.mateChess.get(square);
+  if(state.selected){
+    const move=state.legalTargets.includes(square)?{from:state.selected,to:square,promotion:state.promotion}:null;
+    if(move){ attemptMateMove(move); return; }
+  }
+  if(piece && piece.color===state.mateChess.turn()){
+    state.selected=square;
+    state.legalTargets=state.mateChess.moves({square,verbose:true}).map(m=>m.to);
+  } else clearSelection();
   drawBoard();
 }
 
@@ -398,8 +467,8 @@ function attemptMove(move){
     if(!legal) return;
     const expected=studyExpected();
     if(legal.san!==expected){
-      state.selected=null; state.legalTargets=[];
-      state.studyMessage=`Falsch – ${legal.san} war nicht der vorgegebene Zug. Der Zug wurde zurückgenommen. Versuche es erneut.`;
+      clearSelection();
+      state.studyMessage=`Falsch – ${legal.san} ist nicht der vorgegebene Zug. Der Zug wurde nicht ausgeführt.`;
       render();
       return;
     }
@@ -409,8 +478,32 @@ function attemptMove(move){
   makeMove(move, false);
 }
 
+function attemptMateMove(move){
+  const legal=state.mateChess.moves({verbose:true}).find(m=>m.from===move.from && m.to===move.to);
+  if(!legal) return;
+  const uci=legal.from+legal.to+(legal.promotion||"");
+  if(state.mateSolutions.includes(uci)){
+    state.mateChess.move({from:legal.from,to:legal.to,promotion:legal.promotion||"q"});
+    state.mateHistory.push({san:legal.san,lan:legal.lan,color:legal.color});
+    state.mateSolved++;
+    state.mateMessage=`Richtig! ${legal.san} ist Schachmatt.`;
+    state.mateSolutionShown=false;
+    clearSelection();
+    render();
+    setTimeout(()=>startMate(state.mateDifficulty),550);
+  } else {
+    clearSelection();
+    state.mateSolutionShown=true;
+    const solution=state.mateSolutions[0];
+    const sm=state.mateChess.moves({verbose:true}).find(m=>m.lan===solution);
+    state.mateMessage=`Falsch. ${legal.san} wurde zurückgesetzt. Lösung: ${sm?.san || solution}`;
+    if(sm){state.selected=sm.from;state.legalTargets=[sm.to];}
+    render();
+  }
+}
+
 function makeMove(move, isStudy=false){
-  if(state.gameOver) return;
+  if(state.screen==="game" && state.gameOver) return;
   const before=state.chess.fen();
   const made=state.chess.move(move);
   if(!made) return;
@@ -430,13 +523,68 @@ function makeMove(move, isStudy=false){
     return;
   }
 
-  // Auch der letzte Zug einer Partie wird sofort für die Hintergrundanalyse eingeplant.
-  backgroundAnalyzeMove(state.history.length - 1);
   if(state.chess.isGameOver()){endGame(gameOverText());return;}
   render();
   // Analyse jeden abgeschlossenen Zug bereits im Hintergrund. Die Ergebnisse
   // werden nicht angezeigt; dadurch ist die spätere Partieanalyse fast sofort verfügbar.
+  backgroundAnalyzeMove(state.history.length - 1);
   if(state.mode==="bot" && currentColor()!==state.humanColor) botMove();
+}
+
+function validateMatePosition(item){
+  try{
+    const chess=new Chess(item.fen);
+    const counts=countPieces(chess);
+    const [min,max] = state.mateDifficulty==="easy" ? [0,5] : state.mateDifficulty==="medium" ? [6,10] : [11,16];
+    if(counts.w<min || counts.w>max || counts.b<min || counts.b>max) return null;
+    const solutions=chess.moves({verbose:true}).filter(m=>{
+      const copy=new Chess(item.fen);
+      try{
+        copy.move({from:m.from,to:m.to,promotion:m.promotion||"q"});
+        return copy.isCheckmate();
+      }catch{return false;}
+    }).map(m=>m.from+m.to+(m.promotion||""));
+    if(!solutions.length) return null;
+    return {chess,solutions,counts};
+  }catch{return null;}
+}
+
+function startMate(difficulty){
+  state.screen="mate";
+  state.mateDifficulty=difficulty;
+  state.mateMessage="";
+  state.mateSolutionShown=false;
+  state.selected=null; state.legalTargets=[];
+  state.mateHistory=[];
+  const pool=MATE_POSITIONS[difficulty] || [];
+  let valid=[];
+  for(const item of pool){
+    const checked=validateMatePosition(item);
+    if(checked) valid.push({...item,...checked});
+  }
+  if(!valid.length){
+    state.matePosition=null; state.mateSolutions=[]; state.mateChess=new Chess();
+    state.mateMessage="Für diese Schwierigkeit konnte keine gültige Stellung geladen werden.";
+    render();
+    return;
+  }
+  const item=valid[Math.floor(Math.random()*valid.length)];
+  state.matePosition=item;
+  state.mateChess=item.chess;
+  state.mateSolutions=item.solutions;
+  state.orientation=state.mateChess.turn();
+  render();
+}
+
+function revealMateSolution(){
+  if(!state.matePosition || !state.mateSolutions.length) return;
+  const solution=state.mateSolutions[0];
+  const sm=state.mateChess.moves({verbose:true}).find(m=>m.lan===solution);
+  state.mateSolutionShown=true;
+  state.mateMessage=`Lösung: ${sm?.san || solution} — spiele diesen Zug.`;
+  clearSelection();
+  if(sm){state.selected=sm.from;state.legalTargets=[sm.to];}
+  render();
 }
 
 async function studyOpponentMove(){
@@ -457,67 +605,11 @@ function startStudy(id){
   const study=STUDIES.find(s=>s.id===id);
   if(!study) return;
   state.screen="study"; state.study=study; state.studyIndex=0; state.studyComplete=false; state.studyMessage="";
-  state.chess=new Chess(); state.history=[]; state.selected=null; state.legalTargets=[]; state.running=false; state.gameOver=false; state.lastTick=performance.now();
-  state.orientation=study.color; // Spielerperspektive
+  state.studyChess=new Chess(); state.studyHistory=[]; state.selected=null; state.legalTargets=[];
+  state.running=false; state.lastTick=performance.now();
+  state.orientation=study.color;
   render();
   if(study.color==="b") setTimeout(studyOpponentMove,350);
-}
-
-
-function countFenPieces(fen){
-  const boardPart=fen.split(" ")[0];
-  return {w:(boardPart.match(/[KQRBNP]/g)||[]).length,b:(boardPart.match(/[kqrbnp]/g)||[]).length};
-}
-function startMate(level){
-  const list=MATE_IN_1[level]||MATE_IN_1.easy;
-  let candidates=list.filter(x=>{
-    const c=countFenPieces(x.fen);
-    return c.w>=1&&c.b>=1;
-  });
-  const current=state.matePosition?.fen;
-  if(candidates.length>1) candidates=candidates.filter(x=>x.fen!==current);
-  const chosen=candidates[Math.floor(Math.random()*candidates.length)]||list[0];
-  state.screen="mate";
-  state.mateLevel=level;
-  state.matePosition=chosen;
-  state.mateAnswer=chosen.answer;
-  state.mateMessage="";
-  state.mateBusy=false;
-  state.chess=new Chess(chosen.fen);
-  state.history=[];
-  state.selected=null;state.legalTargets=[];
-  state.orientation=state.chess.turn();
-  render();
-}
-function attemptMateMove(move){
-  const legal=state.chess.moves({verbose:true}).find(m=>m.from===move.from&&m.to===move.to&&(!move.promotion||m.promotion===move.promotion));
-  if(!legal)return;
-  if(legal.san!==state.mateAnswer){
-    const before=state.chess.fen();
-    state.chess.move({from:legal.from,to:legal.to,promotion:legal.promotion||"q"});
-    state.chess.load(before);
-    state.selected=null;state.legalTargets=[];
-    state.mateMessage="Falsch – der Zug wurde zurückgenommen. Der richtige Zug wird angezeigt.";
-    state.mateBusy=false;
-    render();
-    setTimeout(showMateHint,250);
-    return;
-  }
-  state.chess.move({from:legal.from,to:legal.to,promotion:legal.promotion||"q"});
-  state.selected=null;state.legalTargets=[];
-  state.mateMessage="Richtig! 🎉 Nächste Stellung wird geladen…";
-  render();
-  setTimeout(()=>startMate(state.mateLevel),650);
-}
-function showMateHint(){
-  if(!state.matePosition)return;
-  const legal=state.chess.moves({verbose:true}).find(m=>m.san===state.mateAnswer);
-  if(!legal)return;
-  state.mateBusy=true;
-  state.selected=legal.from;state.legalTargets=[legal.to];
-  state.mateMessage=`Lösung: ${legal.san}`;
-  render();
-  state.mateBusy=false;
 }
 
 function gameOverText(){
@@ -530,8 +622,9 @@ function gameOverText(){
 }
 
 function newGame(){
-  state.screen="game"; state.study=null; state.matePosition=null; state.mateMessage=""; state.chess=new Chess();
-  state.clocks={w:state.timeBase*1000,b:state.timeBase*1000}; state.running=false;state.gameOver=false;state.history=[];state.analysis=[];state.analysisCache=[];state.hints={w:3,b:3};state.selected=null;state.legalTargets=[];state.engineBusy=false;state.lastTick=performance.now();
+  state.screen="game"; state.study=null;
+  state.gameChess=new Chess(); state.gameHistory=[]; state.gameGameOver=false;
+  state.clocks={w:state.timeBase*1000,b:state.timeBase*1000}; state.running=false;state.gameOver=false;state.analysis=[];state.analysisCache=[];state.hints={w:3,b:3};state.selected=null;state.legalTargets=[];state.engineBusy=false;state.lastTick=performance.now();
   document.querySelector("#resultModal")?.classList.add("hidden"); document.querySelector("#analysisModal")?.classList.add("hidden");
   render();
   if(state.mode==="bot" && state.humanColor==="b") botMove();
@@ -595,13 +688,15 @@ function engineEval(fen,movetime=1200){
   });
 }
 async function botMove(){
-  if(state.engineBusy||state.gameOver)return;
+  if(state.screen!=="game" || state.engineBusy || state.gameOver)return;
+  const gameRef=state.gameChess;
   state.engineBusy=true;render();
   try{
-    const best=await engineBestMove(state.chess.fen(),5000);
-    if(!state.gameOver&&currentColor()!==state.humanColor&&best&&best!=="(none)")makeMove({from:best.slice(0,2),to:best.slice(2,4),promotion:best[4]||"q"});
-  }catch(e){console.error(e);const h=document.querySelector("#hintText");if(h)h.textContent="Stockfish konnte nicht antworten.";}
-  finally{state.engineBusy=false;if(!state.gameOver)render();}
+    const best=await engineBestMove(gameRef.fen(),5000);
+    if(state.screen==="game" && state.gameChess===gameRef && !state.gameOver && currentColor()!==state.humanColor && best&&best!=="(none)")
+      makeMove({from:best.slice(0,2),to:best.slice(2,4),promotion:best[4]||"q"});
+  }catch(e){console.error(e);if(state.screen==="game"){const h=document.querySelector("#hintText");if(h)h.textContent="Stockfish konnte nicht antworten.";}}
+  finally{state.engineBusy=false;if(state.screen==="game" && state.gameChess===gameRef && !state.gameOver)render();}
 }
 async function useHint(){
   const color=currentColor();if(state.hints[color]<=0||state.gameOver||state.engineBusy)return;
