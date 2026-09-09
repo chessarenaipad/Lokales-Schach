@@ -31,24 +31,24 @@ const STUDIES = [
 ];
 
 const MATE_POSITIONS = {
-  // Diese Stellungen sind bewusst sehr einfach konstruiert und werden zusätzlich
-  // bei jedem Laden vollständig mit chess.js geprüft. In allen Stellungen ist
-  // Qg7# der Mattzug. Dadurch ist der Mate-Modus unabhängig von externen
-  // Puzzle-Datenbanken und kann nicht mehr leer laufen.
+  // Alle Positionen hier sind bewusst konstruiert und werden zusätzlich vor jeder
+  // Anzeige mit chess.js vollständig geprüft. Das Muster ist Qg7#: Der schwarze
+  // König steht auf h8, die Dame zieht von g6 nach g7 und wird vom weißen König
+  // auf f6 geschützt. g8 und h7 sind durch die Dame gedeckt.
   easy: [
-    { fen:"r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1", solution:"g6g7" },
-    { fen:"1r5k/1p6/6Q1/5K2/8/8/1P6/1R6 w - - 0 1", solution:"g6g7" },
-    { fen:"2r4k/2p5/6Q1/5K2/8/8/2P5/2R5 w - - 0 1", solution:"g6g7" }
+    { fen:"7k/p7/5KQ1/8/8/8/P7/8 w - - 0 1", solution:"g6g7" },
+    { fen:"7k/1p6/5KQ1/8/8/8/1P6/8 w - - 0 1", solution:"g6g7" },
+    { fen:"7k/2p5/5KQ1/8/8/8/2P5/8 w - - 0 1", solution:"g6g7" }
   ],
   medium: [
-    { fen:"rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1", solution:"g6g7" },
-    { fen:"1rrb3k/1pppp3/6Q1/5K2/8/8/1PPPP3/1RR5 w - - 0 1", solution:"g6g7" },
-    { fen:"2rrb2k/2pppp2/6Q1/5K2/8/8/2PPPP2/2RR4 w - - 0 1", solution:"g6g7" }
+    { fen:"7k/pppp1p1p/5KQ1/8/8/8/PPPP4/8 w - - 0 1", solution:"g6g7" },
+    { fen:"7k/1ppp1p1p/5KQ1/8/8/8/1PPP4/8 w - - 0 1", solution:"g6g7" },
+    { fen:"7k/p1pp1p1p/5KQ1/8/8/8/P1PP4/8 w - - 0 1", solution:"g6g7" }
   ],
   hard: [
-    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" },
-    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" },
-    { fen:"rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1", solution:"g6g7" }
+    { fen:"rrnn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" },
+    { fen:"rrqr3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" },
+    { fen:"rrbn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" }
   ]
 };
 
@@ -573,9 +573,9 @@ function startMate(difficulty){
   // Mate-Modus niemals mehr den Zustand „keine gültige Stellung geladen“.
   if(!valid.length){
     const fallback = {
-      easy: "r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1",
-      medium: "rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1",
-      hard: "rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1"
+      easy: "7k/p7/5KQ1/8/8/8/P7/8 w - - 0 1",
+      medium: "7k/pppp1p1p/5KQ1/8/8/8/PPPP4/8 w - - 0 1",
+      hard: "rrnn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1"
     }[difficulty];
     try{
       const chess=new Chess(fallback,{skipValidation:true});
@@ -593,9 +593,9 @@ function startMate(difficulty){
     // Schwierigkeit passende Figurenanzahl verwendet. Der bekannte Mattzug
     // Qg7# wird direkt hinterlegt.
     const fallbackFen = {
-      easy: "r6k/p7/6Q1/5K2/8/8/P7/R7 w - - 0 1",
-      medium: "rrb4k/pppp4/6Q1/5K2/8/8/PPPP4/RR6 w - - 0 1",
-      hard: "rrbb3k/ppppnn2/6Q1/5K2/8/8/PPP1NN2/RRBB4 w - - 0 1"
+      easy: "7k/p7/5KQ1/8/8/8/P7/8 w - - 0 1",
+      medium: "7k/pppp1p1p/5KQ1/8/8/8/PPPP4/8 w - - 0 1",
+      hard: "rrnn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1"
     }[difficulty];
     const chess=new Chess(fallbackFen,{skipValidation:true});
     state.matePosition={fen:fallbackFen,solution:"g6g7"};
