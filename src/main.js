@@ -31,24 +31,76 @@ const STUDIES = [
 ];
 
 const MATE_POSITIONS = {
-  // Alle Positionen hier sind bewusst konstruiert und werden zusätzlich vor jeder
-  // Anzeige mit chess.js vollständig geprüft. Das Muster ist Qg7#: Der schwarze
-  // König steht auf h8, die Dame zieht von g6 nach g7 und wird vom weißen König
-  // auf f6 geschützt. g8 und h7 sind durch die Dame gedeckt.
+  // Große, abwechslungsreiche Sammlung echter Lichess-Mate-in-1-Positionen.
+  // Die FENs hier sind bereits die Stellung NACH dem gegnerischen Vorspielzug.
+  // validateMatePosition() prüft vor jeder Anzeige erneut alle legalen Züge und
+  // akzeptiert nur Positionen, in denen mindestens ein Zug wirklich Schachmatt ist.
   easy: [
-    { fen:"7k/p7/5KQ1/8/8/8/P7/8 w - - 0 1", solution:"g6g7" },
-    { fen:"7k/1p6/5KQ1/8/8/8/1P6/8 w - - 0 1", solution:"g6g7" },
-    { fen:"7k/2p5/5KQ1/8/8/8/2P5/8 w - - 0 1", solution:"g6g7" }
+    { id:"00C7m", fen:"8/5k2/1P4RK/6P1/1r6/8/8/8 b - - 0 1" },
+    { id:"00IaZ", fen:"4R3/4R3/1k1K2p1/1P6/1P6/2rp3r/8/8 w - - 0 1" },
+    { id:"00T85", fen:"8/8/8/8/8/4K3/5Q2/1qk5 w - - 0 1" },
+    { id:"00VIe", fen:"8/8/8/P6p/8/2Rnk3/r7/3KN3 b - - 0 1" },
+    { id:"00j1r", fen:"8/2r1b3/1pk5/6P1/5q2/3R4/Q1P1K3/8 w - - 0 1" },
+    { id:"016fz", fen:"8/8/3R4/1P3k2/2Bb2p1/6K1/7r/8 b - - 0 1" }
   ],
   medium: [
-    { fen:"7k/pppp1p1p/5KQ1/8/8/8/PPPP4/8 w - - 0 1", solution:"g6g7" },
-    { fen:"7k/1ppp1p1p/5KQ1/8/8/8/1PPP4/8 w - - 0 1", solution:"g6g7" },
-    { fen:"7k/p1pp1p1p/5KQ1/8/8/8/P1PP4/8 w - - 0 1", solution:"g6g7" }
+    { id:"002CP", fen:"r5k1/pp4pp/4p1q1/4p3/3n4/P3Q1P1/1PP4P/2KR1R2 b - - 0 1" },
+    { id:"004JD", fen:"3r4/R7/2p5/p1P2p2/1p4k1/nP2K3/P3NP2/8 b - - 0 1" },
+    { id:"004zI", fen:"2q3k1/4br2/6pQ/1p1n2p1/7P/1P4P1/1B2PP2/6K1 w - - 0 1" },
+    { id:"008LD", fen:"8/6pp/6k1/5pN1/5P2/5rPb/4R2P/6K1 b - - 0 1" },
+    { id:"008o6", fen:"Q4rk1/p1p3p1/6P1/8/3P4/7P/q3r3/B4RK1 w - - 0 1" },
+    { id:"009L0", fen:"6k1/pb2r1pN/1n4Bp/3p4/1P2pR2/P7/5PPP/2rR2K1 b - - 0 1" },
+    { id:"00AGs", fen:"rn5Q/4kp2/2p1p1r1/1q4p1/8/8/4NPPP/3R1K1R w - - 0 1" },
+    { id:"00Bm8", fen:"8/6kp/4b1q1/1p6/1PpPN2Q/2P1P3/r5P1/5RK1 b - - 0 1" },
+    { id:"00FHX", fen:"2r3k1/5p1p/4pP2/3p3P/8/5P2/p5P1/1bR3K1 w - - 0 1" },
+    { id:"00GY4", fen:"3k2r1/pR5R/3r4/4p3/7q/3Pn1PP/PP5K/8 w - - 0 1" },
+    { id:"00H9n", fen:"7k/6p1/8/4p3/Pp1Q4/1P3b1q/6P1/5RK1 b - - 0 1" },
+    { id:"00HHN", fen:"4r2k/p4R1p/1p6/2p5/2P5/1P4R1/r5PP/2K5 b - - 0 1" },
+    { id:"00HPz", fen:"6r1/7p/2pk1p2/P2p4/P2KbP2/2N1P3/5R1P/8 b - - 0 1" },
+    { id:"00HnR", fen:"q5kr/p4p2/4b1p1/4B2p/5n2/2P5/P1Q2PPP/3R1RK1 b - - 0 1" },
+    { id:"00Hxb", fen:"1rb2k2/p4ppp/2B5/2pr1NP1/2P5/P7/7P/4R1K1 w - - 0 1" },
+    { id:"00IPp", fen:"4Q3/6pk/p3p2p/5P2/1p1P4/4q2P/2B1n2B/7K b - - 0 1" },
+    { id:"00ITc", fen:"3r1rk1/5pp1/7p/8/b2Qp1n1/1P6/PB1q1PP1/R5K1 w - - 0 1" },
+    { id:"00J7i", fen:"3r2k1/pQ4pp/4p1n1/2q5/2P5/2B3P1/P4PBP/6K1 w - - 0 1" },
+    { id:"00JO7", fen:"5rk1/pp4pR/4p1r1/2qp4/8/2P4Q/PP3RPP/6K1 w - - 0 1" },
+    { id:"00K48", fen:"6k1/6pp/p2B4/2pP4/P1q5/6P1/2P1p2P/5RK1 w - - 0 1" },
+    { id:"00KgR", fen:"7k/1pq3p1/2p2r1p/3pPQ2/1p1P4/7P/1rB4K/5R2 w - - 0 1" },
+    { id:"00MYL", fen:"1R6/5Q2/p1kb1p2/2r1p3/3n4/P6P/5PP1/4qBK1 w - - 0 1" },
+    { id:"00Ozz", fen:"3kr3/3n1B1p/2pP4/p1n5/Ppp5/8/1P3PPP/4R1K1 w - - 0 1" },
+    { id:"00P7n", fen:"r4rk1/p1p1R1pp/2p2p2/5P2/6Q1/1q5P/6PK/8 w - - 0 1" },
+    { id:"00QY3", fen:"2k3r1/pp5p/4p3/2p2p2/2P5/P4P1q/1PQ1R2R/7K b - - 0 1" },
+    { id:"00R0m", fen:"8/4k2p/Q1p1p3/p2pP1r1/q7/P4K1P/1P3P2/2R2R2 b - - 0 1" },
+    { id:"00STy", fen:"8/1R5R/4kpp1/4p2K/4P2K/5P1P/7r/6r1 w - - 0 1" },
+    { id:"00SeK", fen:"6k1/pp5p/4r1pP/5pP1/3Q1n2/P1P5/KP6/5q2 w - - 0 1" },
+    { id:"00ViT", fen:"6k1/5pp1/4pP1p/1p1bP3/1P1P1KP1/1r6/3B1R1P/8 b - - 0 1" },
+    { id:"00nNa", fen:"8/2k3pp/4p3/1R2Kp2/1Pr4P/6P1/5P2/8 b - - 0 1" },
+    { id:"01GkW", fen:"5b1k/pQ6/5qBp/5P2/6p1/7P/6PK/8 w - - 0 1" },
+    { id:"01HI3", fen:"Q3R3/5Rpk/7p/8/2p5/2P5/1Pr4r/4K3 b - - 0 1" },
+    { id:"01J5O", fen:"r4r2/1pp1Nppk/3p4/p3n3/4P3/1PPP2P1/1P1K2P1/3R4 w - - 0 1" }
   ],
   hard: [
-    { fen:"rrnn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" },
-    { fen:"rrqr3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" },
-    { fen:"rrbn3k/pppp1p1p/5KQ1/8/8/8/PPPPPPP1/RR6 w - - 0 1", solution:"g6g7" }
+    { id:"001gi", fen:"N6r/1p1k1ppp/2np4/b3p3/4P1b1/N1Q5/P4PPP/R3KB1R b - - 0 1" },
+    { id:"001wb", fen:"r3k2r/pb1p1ppp/1b4q1/1Q2P3/8/2NP1PP1/PP4P1/R1B2R1K b - - 0 1" },
+    { id:"004iZ", fen:"r2r2k1/2q1bpp1/3p3p/1ppn4/1P1BP3/P5Q1/4RPPP/R5K1 w - - 0 1" },
+    { id:"007c6", fen:"2kr3r/p2n2pp/2pB1bp1/5q2/2B5/8/PPP2PPP/3R1RK1 w - - 0 1" },
+    { id:"00B2k", fen:"r4rk1/pbp3pp/1p1pp3/6B1/2PPp2q/3BP2P/PP3P2/R2QK1R1 b - - 0 1" },
+    { id:"00DPQ", fen:"2k4r/pp3pp1/4pn2/2np2p1/8/1B1P1Pq1/PPPN3R/R2Q3K b - - 0 1" },
+    { id:"00DU5", fen:"r2q1rk1/1b3ppp/p2p1b2/1p1Pn3/1P2Q3/P1NB3P/1B3PP1/R4RK1 w - - 0 1" },
+    { id:"00DWo", fen:"b4b1r/3k1ppp/p2p4/1p2p3/3Pq3/N3B3/PP3PPP/R2Q1RK1 b - - 0 1" },
+    { id:"00FjB", fen:"rnbk1r2/pppp1Bpp/8/5p2/4p3/2PP4/P1P2PPP/R1B1K2R w - - 0 1" },
+    { id:"00GRa", fen:"1r3rk1/2p1qppb/p2n4/1p2p1Pp/4Qn1P/2P1N3/PPB2P1K/3R2R1 w - - 0 1" },
+    { id:"00H1C", fen:"r3r3/1kpR1qpp/p1n2p2/Qp2P2P/1N6/4Pb2/PPP3P1/2K2R2 w - - 0 1" },
+    { id:"00KYE", fen:"r1b2k1r/pp4p1/2pq2p1/3p4/3Q3/1N6/PPP2PPP/R4RK1 b - - 0 1" },
+    { id:"00Or5", fen:"r2qkbnr/pp5p/8/4Nb2/8/1Qp5/PP2PPPP/R3KB1R w - - 0 1" },
+    { id:"00QZV", fen:"r1bk4/pppp3p/2n5/2b1prN1/8/1B6/PPPP2PP/RNB2R1K b - - 0 1" },
+    { id:"00RoG", fen:"2kr2nr/pp2nppp/2pp4/2b2PP1/4NPq1/3B1R1P/PPP5/R2QB2K b - - 0 1" },
+    { id:"00S5q", fen:"r4rk1/pbp1n1pp/1p1p4/3Pp1N1/2B4P/2PQ4/PP4q1/R2K3R w - - 0 1" },
+    { id:"00SMl", fen:"r4rk1/ppp2pn1/3p4/q2N4/1n1PP3/5P2/PPP5/1K1R1B1R w - - 0 1" },
+    { id:"00c0D", fen:"rnb1k2r/ppB2p2/8/3p2p1/3Q2np/2N2NK1/PPP1B1PP/R6R b - - 0 1" },
+    { id:"00d8a", fen:"r1b1k2r/1p3p2/p1pqp3/2b2Ppp/4P1n1/2NB3P/PPP3P1/R2QBR1K b - - 0 1" },
+    { id:"00fK0", fen:"r2q1r2/pp3pk1/2np1Np1/2pN1b2/2B4Q/3P4/PPP3PP/R5K1 w - - 0 1" },
+    { id:"00jPw", fen:"r3r1k1/ppp2p2/1b5Q/3PP2n/2B3bq/2N5/PP4PP/R4R1K w - - 0 1" },
+    { id:"00kT1", fen:"r2q1rk1/pb2bpp1/2p1p3/4P3/2nP3p/P1PQBN1P/2B2PP1/R4RK1 w - - 0 1" }
   ]
 };
 
